@@ -74,13 +74,38 @@
 
 	var _custom2 = _interopRequireDefault(_custom);
 
+	var _interval = __webpack_require__(351);
+
+	var _interval2 = _interopRequireDefault(_interval);
+
+	var _mapNpluck = __webpack_require__(352);
+
+	var _mapNpluck2 = _interopRequireDefault(_mapNpluck);
+
+	var _mergeNconcat = __webpack_require__(353);
+
+	var _mergeNconcat2 = _interopRequireDefault(_mergeNconcat);
+
+	var _mergeMap = __webpack_require__(354);
+
+	var _mergeMap2 = _interopRequireDefault(_mergeMap);
+
+	var _switchMap = __webpack_require__(355);
+
+	var _switchMap2 = _interopRequireDefault(_switchMap);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	(0, _btn2.default)();
-	(0, _mouse2.default)();
-	(0, _input2.default)();
-	(0, _static2.default)();
-	(0, _custom2.default)();
+	// btnEvent();
+	// mouseEvent();
+	// inputEvent();
+	// staticArr(); 
+	// customObservable();
+	// interval();
+	// mapNpluck();
+	// mergeNconcat();
+	// mergeMap();
+	(0, _switchMap2.default)();
 
 /***/ },
 /* 1 */
@@ -10343,7 +10368,7 @@
 	        var operator = this.operator;
 	        var sink = toSubscriber_1.toSubscriber(observerOrNext, error, complete);
 	        if (operator) {
-	            operator.call(sink, this);
+	            operator.call(sink, this.source);
 	        } else {
 	            sink.add(this._subscribe(sink));
 	        }
@@ -11639,6 +11664,11 @@
 	 * var bmi = Rx.Observable.combineLatest(weight, height, (w, h) => w / (h * h));
 	 * bmi.subscribe(x => console.log('BMI is ' + x));
 	 *
+	 * // With output to console:
+	 * // BMI is 24.212293388429753
+	 * // BMI is 23.93948099205209
+	 * // BMI is 23.671253629592222
+	 *
 	 * @see {@link combineAll}
 	 * @see {@link merge}
 	 * @see {@link withLatestFrom}
@@ -11941,6 +11971,12 @@
 	     * );
 	     * result.subscribe(x => console.log(x));
 	     *
+	     * // Results in the following to the console:
+	     * // x is equal to the count on the interval eg(0,1,2,3,...)
+	     * // x will occur every 1000ms
+	     * // if x % 2 is equal to 1 print abc
+	     * // if x % 2 is not equal to 1 nothing will be output
+	     *
 	     * @see {@link create}
 	     * @see {@link never}
 	     * @see {@link of}
@@ -12018,6 +12054,11 @@
 	 * var bmi = weight.combineLatest(height, (w, h) => w / (h * h));
 	 * bmi.subscribe(x => console.log('BMI is ' + x));
 	 *
+	 * // With output to console:
+	 * // BMI is 24.212293388429753
+	 * // BMI is 23.93948099205209
+	 * // BMI is 23.671253629592222
+	 *
 	 * @see {@link combineAll}
 	 * @see {@link merge}
 	 * @see {@link withLatestFrom}
@@ -12055,7 +12096,7 @@
 	        this.project = project;
 	    }
 	    CombineLatestOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new CombineLatestSubscriber(subscriber, this.project));
+	        return source.subscribe(new CombineLatestSubscriber(subscriber, this.project));
 	    };
 	    return CombineLatestOperator;
 	}();
@@ -12390,12 +12431,21 @@
 	 * var result = timer.concat(sequence);
 	 * result.subscribe(x => console.log(x));
 	 *
+	 * // results in:
+	 * // 1000ms-> 0 -1000ms-> 1 -1000ms-> 2 -1000ms-> 3 -immediate-> 1 ... 10
+	 *
 	 * @example <caption>Concatenate 3 Observables</caption>
 	 * var timer1 = Rx.Observable.interval(1000).take(10);
 	 * var timer2 = Rx.Observable.interval(2000).take(6);
 	 * var timer3 = Rx.Observable.interval(500).take(10);
 	 * var result = timer1.concat(timer2, timer3);
 	 * result.subscribe(x => console.log(x));
+	 *
+	 * // results in the following:
+	 * // (Prints to console sequentially)
+	 * // -1000ms-> 0 -1000ms-> 1 -1000ms-> ... 9
+	 * // -2000ms-> 0 -2000ms-> 1 -2000ms-> ... 5
+	 * // -500ms-> 0 -500ms-> 1 -500ms-> ... 9
 	 *
 	 * @see {@link concatAll}
 	 * @see {@link concatMap}
@@ -12438,12 +12488,21 @@
 	 * var result = Rx.Observable.concat(timer, sequence);
 	 * result.subscribe(x => console.log(x));
 	 *
+	 * // results in:
+	 * // 0 -1000ms-> 1 -1000ms-> 2 -1000ms-> 3 -immediate-> 1 ... 10
+	 *
 	 * @example <caption>Concatenate 3 Observables</caption>
 	 * var timer1 = Rx.Observable.interval(1000).take(10);
 	 * var timer2 = Rx.Observable.interval(2000).take(6);
 	 * var timer3 = Rx.Observable.interval(500).take(10);
 	 * var result = Rx.Observable.concat(timer1, timer2, timer3);
 	 * result.subscribe(x => console.log(x));
+	 *
+	 * // results in the following:
+	 * // (Prints to console sequentially)
+	 * // -1000ms-> 0 -1000ms-> 1 -1000ms-> ... 9
+	 * // -2000ms-> 0 -2000ms-> 1 -2000ms-> ... 5
+	 * // -500ms-> 0 -500ms-> 1 -500ms-> ... 9
 	 *
 	 * @see {@link concatAll}
 	 * @see {@link concatMap}
@@ -12550,7 +12609,7 @@
 	        this.concurrent = concurrent;
 	    }
 	    MergeAllOperator.prototype.call = function (observer, source) {
-	        return source._subscribe(new MergeAllSubscriber(observer, this.concurrent));
+	        return source.subscribe(new MergeAllSubscriber(observer, this.concurrent));
 	    };
 	    return MergeAllOperator;
 	}();
@@ -12674,6 +12733,12 @@
 	     *   }
 	     * });
 	     * clicksOrInterval.subscribe(x => console.log(x));
+	     *
+	     * // Results in the following behavior:
+	     * // If the result of Math.random() is greater than 0.5 it will listen
+	     * // for clicks anywhere on the "document"; when document is clicked it
+	     * // will log a MouseEvent object to the console. If the result is less
+	     * // than 0.5 it will emit ascending numbers, one every second(1000ms).
 	     *
 	     * @see {@link create}
 	     *
@@ -12969,6 +13034,9 @@
 	     * var result = Rx.Observable.from(array);
 	     * result.subscribe(x => console.log(x));
 	     *
+	     * // Results in the following:
+	     * // 10 20 30
+	     *
 	     * @example <caption>Convert an infinite iterable (from a generator) to an Observable</caption>
 	     * function* generateDoubles(seed) {
 	     *   var i = seed;
@@ -12981,6 +13049,9 @@
 	     * var iterator = generateDoubles(3);
 	     * var result = Rx.Observable.from(iterator).take(10);
 	     * result.subscribe(x => console.log(x));
+	     *
+	     * // Results in the following:
+	     * // 3 6 12 24 48 96 192 384 768 1536
 	     *
 	     * @see {@link create}
 	     * @see {@link fromEvent}
@@ -13471,7 +13542,7 @@
 	        this.delay = delay;
 	    }
 	    ObserveOnOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new ObserveOnSubscriber(subscriber, this.scheduler, this.delay));
+	        return source.subscribe(new ObserveOnSubscriber(subscriber, this.scheduler, this.delay));
 	    };
 	    return ObserveOnOperator;
 	}();
@@ -13743,6 +13814,10 @@
 	     * @example <caption>Emits clicks happening on the DOM document</caption>
 	     * var clicks = Rx.Observable.fromEvent(document, 'click');
 	     * clicks.subscribe(x => console.log(x));
+	     *
+	     * // Results in:
+	     * // MouseEvent object logged to console everytime a click
+	     * // occurs on the document.
 	     *
 	     * @see {@link from}
 	     * @see {@link fromEventPattern}
@@ -14825,6 +14900,12 @@
 	 * var clicksOrTimer = Rx.Observable.merge(clicks, timer);
 	 * clicksOrTimer.subscribe(x => console.log(x));
 	 *
+	 * // Results in the following:
+	 * // timer will emit ascending values, one every second(1000ms) to console
+	 * // clicks logs MouseEvents to console everytime the "document" is clicked
+	 * // Since the two streams are merged you see these happening
+	 * // as they occur.
+	 *
 	 * @example <caption>Merge together 3 Observables, but only 2 run concurrently</caption>
 	 * var timer1 = Rx.Observable.interval(1000).take(10);
 	 * var timer2 = Rx.Observable.interval(2000).take(6);
@@ -14832,6 +14913,15 @@
 	 * var concurrent = 2; // the argument
 	 * var merged = Rx.Observable.merge(timer1, timer2, timer3, concurrent);
 	 * merged.subscribe(x => console.log(x));
+	 *
+	 * // Results in the following:
+	 * // - First timer1 and timer2 will run concurrently
+	 * // - timer1 will emit a value every 1000ms for 10 iterations
+	 * // - timer2 will emit a value every 2000ms for 6 iterations
+	 * // - after timer1 hits it's max iteration, timer2 will
+	 * //   continue, and timer3 will start to run concurrently with timer2
+	 * // - when timer2 hits it's max iteration it terminates, and
+	 * //   timer3 will continue to emit a value every 500ms until it is complete
 	 *
 	 * @see {@link mergeAll}
 	 * @see {@link mergeMap}
@@ -14944,7 +15034,7 @@
 	var RaceOperator = function () {
 	    function RaceOperator() {}
 	    RaceOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new RaceSubscriber(subscriber));
+	        return source.subscribe(new RaceSubscriber(subscriber));
 	    };
 	    return RaceOperator;
 	}();
@@ -14971,13 +15061,13 @@
 	        if (len === 0) {
 	            this.destination.complete();
 	        } else {
-	            for (var i = 0; i < len; i++) {
+	            for (var i = 0; i < len && !this.hasFirst; i++) {
 	                var observable = observables[i];
 	                var subscription = subscribeToResult_1.subscribeToResult(this, observable, observable, i);
 	                if (this.subscriptions) {
 	                    this.subscriptions.push(subscription);
-	                    this.add(subscription);
 	                }
+	                this.add(subscription);
 	            }
 	            this.observables = null;
 	        }
@@ -15182,7 +15272,7 @@
 	        this.nextSources = nextSources;
 	    }
 	    OnErrorResumeNextOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new OnErrorResumeNextSubscriber(subscriber, this.nextSources));
+	        return source.subscribe(new OnErrorResumeNextSubscriber(subscriber, this.nextSources));
 	    };
 	    return OnErrorResumeNextOperator;
 	}();
@@ -15907,7 +15997,7 @@
 	        this.project = project;
 	    }
 	    ZipOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new ZipSubscriber(subscriber, this.project));
+	        return source.subscribe(new ZipSubscriber(subscriber, this.project));
 	    };
 	    return ZipOperator;
 	}();
@@ -16332,7 +16422,12 @@
 	            this.error(errorObject_1.errorObject.e);
 	        } else {
 	            this.xhr = xhr;
-	            // open XHR first
+	            // set up the events before open XHR
+	            // https://developer.mozilla.org/en/docs/Web/API/XMLHttpRequest/Using_XMLHttpRequest
+	            // You need to add the event listeners before calling open() on the request.
+	            // Otherwise the progress events will not fire.
+	            this.setupEvents(xhr, request);
+	            // open XHR
 	            var result = void 0;
 	            if (user) {
 	                result = tryCatch_1.tryCatch(xhr.open).call(xhr, method, url, async, user, password);
@@ -16348,8 +16443,6 @@
 	            xhr.responseType = request.responseType;
 	            // set headers
 	            this.setHeaders(xhr, headers);
-	            // now set up the events
-	            this.setupEvents(xhr, request);
 	            // finally send the request
 	            result = body ? tryCatch_1.tryCatch(xhr.send).call(xhr, body) : tryCatch_1.tryCatch(xhr.send).call(xhr);
 	            if (result === errorObject_1.errorObject) {
@@ -16406,14 +16499,18 @@
 	        xhrTimeout.request = request;
 	        xhrTimeout.subscriber = this;
 	        xhrTimeout.progressSubscriber = progressSubscriber;
-	        if (xhr.upload && 'withCredentials' in xhr && root_1.root.XDomainRequest) {
+	        if (xhr.upload && 'withCredentials' in xhr) {
 	            if (progressSubscriber) {
 	                var _xhrProgress_;
 	                _xhrProgress_ = function xhrProgress_1(e) {
 	                    var progressSubscriber = _xhrProgress_.progressSubscriber;
 	                    progressSubscriber.next(e);
 	                };
-	                xhr.onprogress = _xhrProgress_;
+	                if (root_1.root.XDomainRequest) {
+	                    xhr.onprogress = _xhrProgress_;
+	                } else {
+	                    xhr.upload.onprogress = _xhrProgress_;
+	                }
 	                _xhrProgress_.progressSubscriber = progressSubscriber;
 	            }
 	            var _xhrError_;
@@ -16609,7 +16706,7 @@
 	        this.thisArg = thisArg;
 	    }
 	    MapOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new MapSubscriber(subscriber, this.project, this.thisArg));
+	        return source.subscribe(new MapSubscriber(subscriber, this.project, this.thisArg));
 	    };
 	    return MapOperator;
 	}();
@@ -17192,7 +17289,7 @@
 	        this.closingNotifier = closingNotifier;
 	    }
 	    BufferOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new BufferSubscriber(subscriber, this.closingNotifier));
+	        return source.subscribe(new BufferSubscriber(subscriber, this.closingNotifier));
 	    };
 	    return BufferOperator;
 	}();
@@ -17300,7 +17397,7 @@
 	        this.startBufferEvery = startBufferEvery;
 	    }
 	    BufferCountOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new BufferCountSubscriber(subscriber, this.bufferSize, this.startBufferEvery));
+	        return source.subscribe(new BufferCountSubscriber(subscriber, this.bufferSize, this.startBufferEvery));
 	    };
 	    return BufferCountOperator;
 	}();
@@ -17451,7 +17548,7 @@
 	        this.scheduler = scheduler;
 	    }
 	    BufferTimeOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new BufferTimeSubscriber(subscriber, this.bufferTimeSpan, this.bufferCreationInterval, this.maxBufferSize, this.scheduler));
+	        return source.subscribe(new BufferTimeSubscriber(subscriber, this.bufferTimeSpan, this.bufferCreationInterval, this.maxBufferSize, this.scheduler));
 	    };
 	    return BufferTimeOperator;
 	}();
@@ -17653,7 +17750,7 @@
 	        this.closingSelector = closingSelector;
 	    }
 	    BufferToggleOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new BufferToggleSubscriber(subscriber, this.openings, this.closingSelector));
+	        return source.subscribe(new BufferToggleSubscriber(subscriber, this.openings, this.closingSelector));
 	    };
 	    return BufferToggleOperator;
 	}();
@@ -17820,7 +17917,7 @@
 	        this.closingSelector = closingSelector;
 	    }
 	    BufferWhenOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new BufferWhenSubscriber(subscriber, this.closingSelector));
+	        return source.subscribe(new BufferWhenSubscriber(subscriber, this.closingSelector));
 	    };
 	    return BufferWhenOperator;
 	}();
@@ -17938,7 +18035,7 @@
 	        this.selector = selector;
 	    }
 	    CatchOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new CatchSubscriber(subscriber, this.selector, this.caught));
+	        return source.subscribe(new CatchSubscriber(subscriber, this.selector, this.caught));
 	    };
 	    return CatchOperator;
 	}();
@@ -18107,6 +18204,12 @@
 	 * var firstOrder = higherOrder.concatAll();
 	 * firstOrder.subscribe(x => console.log(x));
 	 *
+	 * // Results in the following:
+	 * // (results are not concurrent)
+	 * // For every click on the "document" it will emit values 0 to 3 spaced
+	 * // on a 1000ms interval
+	 * // one click = 1000ms-> 0 -1000ms-> 1 -1000ms-> 2 -1000ms-> 3
+	 *
 	 * @see {@link combineAll}
 	 * @see {@link concat}
 	 * @see {@link concatMap}
@@ -18173,6 +18276,12 @@
 	 * var clicks = Rx.Observable.fromEvent(document, 'click');
 	 * var result = clicks.concatMap(ev => Rx.Observable.interval(1000).take(4));
 	 * result.subscribe(x => console.log(x));
+	 *
+	 * // Results in the following:
+	 * // (results are not concurrent)
+	 * // For every click on the "document" it will emit values 0 to 3 spaced
+	 * // on a 1000ms interval
+	 * // one click = 1000ms-> 0 -1000ms-> 1 -1000ms-> 2 -1000ms-> 3
 	 *
 	 * @see {@link concat}
 	 * @see {@link concatAll}
@@ -18246,6 +18355,15 @@
 	 * );
 	 * result.subscribe(x => console.log(x));
 	 *
+	 * // Results in the following:
+	 * // a0
+	 * // b0
+	 * // c0
+	 * // a1
+	 * // b1
+	 * // c1
+	 * // continues to list a,b,c with respective ascending integers
+	 *
 	 * @see {@link concatMap}
 	 * @see {@link exhaustMap}
 	 * @see {@link merge}
@@ -18295,7 +18413,7 @@
 	        this.concurrent = concurrent;
 	    }
 	    MergeMapOperator.prototype.call = function (observer, source) {
-	        return source._subscribe(new MergeMapSubscriber(observer, this.project, this.resultSelector, this.concurrent));
+	        return source.subscribe(new MergeMapSubscriber(observer, this.project, this.resultSelector, this.concurrent));
 	    };
 	    return MergeMapOperator;
 	}();
@@ -18427,6 +18545,12 @@
 	 * var result = clicks.concatMapTo(Rx.Observable.interval(1000).take(4));
 	 * result.subscribe(x => console.log(x));
 	 *
+	 * // Results in the following:
+	 * // (results are not concurrent)
+	 * // For every click on the "document" it will emit values 0 to 3 spaced
+	 * // on a 1000ms interval
+	 * // one click = 1000ms-> 0 -1000ms-> 1 -1000ms-> 2 -1000ms-> 3
+	 *
 	 * @see {@link concat}
 	 * @see {@link concatAll}
 	 * @see {@link concatMap}
@@ -18538,7 +18662,7 @@
 	        this.concurrent = concurrent;
 	    }
 	    MergeMapToOperator.prototype.call = function (observer, source) {
-	        return source._subscribe(new MergeMapToSubscriber(observer, this.ish, this.resultSelector, this.concurrent));
+	        return source.subscribe(new MergeMapToSubscriber(observer, this.ish, this.resultSelector, this.concurrent));
 	    };
 	    return MergeMapToOperator;
 	}();
@@ -18681,6 +18805,9 @@
 	 * var result = numbers.count(i => i % 2 === 1);
 	 * result.subscribe(x => console.log(x));
 	 *
+	 * // Results in:
+	 * // 4
+	 *
 	 * @see {@link max}
 	 * @see {@link min}
 	 * @see {@link reduce}
@@ -18706,7 +18833,7 @@
 	        this.source = source;
 	    }
 	    CountOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new CountSubscriber(subscriber, this.predicate, this.source));
+	        return source.subscribe(new CountSubscriber(subscriber, this.predicate, this.source));
 	    };
 	    return CountOperator;
 	}();
@@ -18804,6 +18931,11 @@
 	 * var upperCase = materialized.dematerialize();
 	 * upperCase.subscribe(x => console.log(x), e => console.error(e));
 	 *
+	 * // Results in:
+	 * // A
+	 * // B
+	 * // TypeError: x.toUpperCase is not a function
+	 *
 	 * @see {@link Notification}
 	 * @see {@link materialize}
 	 *
@@ -18819,7 +18951,7 @@
 	var DeMaterializeOperator = function () {
 	    function DeMaterializeOperator() {}
 	    DeMaterializeOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new DeMaterializeSubscriber(subscriber));
+	        return source.subscribe(new DeMaterializeSubscriber(subscriber));
 	    };
 	    return DeMaterializeOperator;
 	}();
@@ -18918,7 +19050,7 @@
 	        this.durationSelector = durationSelector;
 	    }
 	    DebounceOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new DebounceSubscriber(subscriber, this.durationSelector));
+	        return source.subscribe(new DebounceSubscriber(subscriber, this.durationSelector));
 	    };
 	    return DebounceOperator;
 	}();
@@ -19072,7 +19204,7 @@
 	        this.scheduler = scheduler;
 	    }
 	    DebounceTimeOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new DebounceTimeSubscriber(subscriber, this.dueTime, this.scheduler));
+	        return source.subscribe(new DebounceTimeSubscriber(subscriber, this.dueTime, this.scheduler));
 	    };
 	    return DebounceTimeOperator;
 	}();
@@ -19193,7 +19325,7 @@
 	        this.defaultValue = defaultValue;
 	    }
 	    DefaultIfEmptyOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new DefaultIfEmptySubscriber(subscriber, this.defaultValue));
+	        return source.subscribe(new DefaultIfEmptySubscriber(subscriber, this.defaultValue));
 	    };
 	    return DefaultIfEmptyOperator;
 	}();
@@ -19306,7 +19438,7 @@
 	        this.scheduler = scheduler;
 	    }
 	    DelayOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new DelaySubscriber(subscriber, this.delay, this.scheduler));
+	        return source.subscribe(new DelaySubscriber(subscriber, this.delay, this.scheduler));
 	    };
 	    return DelayOperator;
 	}();
@@ -19465,7 +19597,7 @@
 	        this.delayDurationSelector = delayDurationSelector;
 	    }
 	    DelayWhenOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new DelayWhenSubscriber(subscriber, this.delayDurationSelector));
+	        return source.subscribe(new DelayWhenSubscriber(subscriber, this.delayDurationSelector));
 	    };
 	    return DelayWhenOperator;
 	}();
@@ -19641,7 +19773,7 @@
 	        this.flushes = flushes;
 	    }
 	    DistinctOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new DistinctSubscriber(subscriber, this.keySelector, this.flushes));
+	        return source.subscribe(new DistinctSubscriber(subscriber, this.keySelector, this.flushes));
 	    };
 	    return DistinctOperator;
 	}();
@@ -19783,7 +19915,7 @@
 	        this.keySelector = keySelector;
 	    }
 	    DistinctUntilChangedOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new DistinctUntilChangedSubscriber(subscriber, this.compare, this.keySelector));
+	        return source.subscribe(new DistinctUntilChangedSubscriber(subscriber, this.compare, this.keySelector));
 	    };
 	    return DistinctUntilChangedOperator;
 	}();
@@ -19955,7 +20087,7 @@
 	        this.complete = complete;
 	    }
 	    DoOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new DoSubscriber(subscriber, this.nextOrObserver, this.error, this.complete));
+	        return source.subscribe(new DoSubscriber(subscriber, this.nextOrObserver, this.error, this.complete));
 	    };
 	    return DoOperator;
 	}();
@@ -20074,7 +20206,7 @@
 	var SwitchFirstOperator = function () {
 	    function SwitchFirstOperator() {}
 	    SwitchFirstOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new SwitchFirstSubscriber(subscriber));
+	        return source.subscribe(new SwitchFirstSubscriber(subscriber));
 	    };
 	    return SwitchFirstOperator;
 	}();
@@ -20196,7 +20328,7 @@
 	        this.resultSelector = resultSelector;
 	    }
 	    SwitchFirstMapOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new SwitchFirstMapSubscriber(subscriber, this.project, this.resultSelector));
+	        return source.subscribe(new SwitchFirstMapSubscriber(subscriber, this.project, this.resultSelector));
 	    };
 	    return SwitchFirstMapOperator;
 	}();
@@ -20365,7 +20497,7 @@
 	        this.scheduler = scheduler;
 	    }
 	    ExpandOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new ExpandSubscriber(subscriber, this.project, this.concurrent, this.scheduler));
+	        return source.subscribe(new ExpandSubscriber(subscriber, this.project, this.concurrent, this.scheduler));
 	    };
 	    return ExpandOperator;
 	}();
@@ -20493,6 +20625,11 @@
 	 * var result = clicks.elementAt(2);
 	 * result.subscribe(x => console.log(x));
 	 *
+	 * // Results in:
+	 * // click 1 = nothing
+	 * // click 2 = nothing
+	 * // click 3 = MouseEvent object logged to console
+	 *
 	 * @see {@link first}
 	 * @see {@link last}
 	 * @see {@link skip}
@@ -20524,7 +20661,7 @@
 	        }
 	    }
 	    ElementAtOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new ElementAtSubscriber(subscriber, this.index, this.defaultValue));
+	        return source.subscribe(new ElementAtSubscriber(subscriber, this.index, this.defaultValue));
 	    };
 	    return ElementAtOperator;
 	}();
@@ -20674,7 +20811,7 @@
 	        this.thisArg = thisArg;
 	    }
 	    FilterOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new FilterSubscriber(subscriber, this.predicate, this.thisArg));
+	        return source.subscribe(new FilterSubscriber(subscriber, this.predicate, this.thisArg));
 	    };
 	    return FilterOperator;
 	}();
@@ -20755,7 +20892,7 @@
 	        this.callback = callback;
 	    }
 	    FinallyOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new FinallySubscriber(subscriber, this.callback));
+	        return source.subscribe(new FinallySubscriber(subscriber, this.callback));
 	    };
 	    return FinallyOperator;
 	}();
@@ -20849,7 +20986,7 @@
 	        this.thisArg = thisArg;
 	    }
 	    FindValueOperator.prototype.call = function (observer, source) {
-	        return source._subscribe(new FindValueSubscriber(observer, this.predicate, this.source, this.yieldIndex, this.thisArg));
+	        return source.subscribe(new FindValueSubscriber(observer, this.predicate, this.source, this.yieldIndex, this.thisArg));
 	    };
 	    return FindValueOperator;
 	}();
@@ -21042,7 +21179,7 @@
 	        this.source = source;
 	    }
 	    FirstOperator.prototype.call = function (observer, source) {
-	        return source._subscribe(new FirstSubscriber(observer, this.predicate, this.resultSelector, this.defaultValue, this.source));
+	        return source.subscribe(new FirstSubscriber(observer, this.predicate, this.resultSelector, this.defaultValue, this.source));
 	    };
 	    return FirstOperator;
 	}();
@@ -21224,7 +21361,7 @@
 	        this.subjectSelector = subjectSelector;
 	    }
 	    GroupByOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new GroupBySubscriber(subscriber, this.keySelector, this.elementSelector, this.durationSelector, this.subjectSelector));
+	        return source.subscribe(new GroupBySubscriber(subscriber, this.keySelector, this.elementSelector, this.durationSelector, this.subjectSelector));
 	    };
 	    return GroupByOperator;
 	}();
@@ -21315,7 +21452,7 @@
 	        this.groups.delete(key);
 	    };
 	    GroupBySubscriber.prototype.unsubscribe = function () {
-	        if (!this.closed && !this.attemptedToUnsubscribe) {
+	        if (!this.closed) {
 	            this.attemptedToUnsubscribe = true;
 	            if (this.count === 0) {
 	                _super.prototype.unsubscribe.call(this);
@@ -21559,7 +21696,7 @@
 	var IgnoreElementsOperator = function () {
 	    function IgnoreElementsOperator() {}
 	    IgnoreElementsOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new IgnoreElementsSubscriber(subscriber));
+	        return source.subscribe(new IgnoreElementsSubscriber(subscriber));
 	    };
 	    return IgnoreElementsOperator;
 	}();
@@ -21622,7 +21759,7 @@
 	var IsEmptyOperator = function () {
 	    function IsEmptyOperator() {}
 	    IsEmptyOperator.prototype.call = function (observer, source) {
-	        return source._subscribe(new IsEmptySubscriber(observer));
+	        return source.subscribe(new IsEmptySubscriber(observer));
 	    };
 	    return IsEmptyOperator;
 	}();
@@ -21729,7 +21866,7 @@
 	        this.durationSelector = durationSelector;
 	    }
 	    AuditOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new AuditSubscriber(subscriber, this.durationSelector));
+	        return source.subscribe(new AuditSubscriber(subscriber, this.durationSelector));
 	    };
 	    return AuditOperator;
 	}();
@@ -21865,7 +22002,7 @@
 	        this.scheduler = scheduler;
 	    }
 	    AuditTimeOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new AuditTimeSubscriber(subscriber, this.duration, this.scheduler));
+	        return source.subscribe(new AuditTimeSubscriber(subscriber, this.duration, this.scheduler));
 	    };
 	    return AuditTimeOperator;
 	}();
@@ -21969,7 +22106,7 @@
 	        this.source = source;
 	    }
 	    LastOperator.prototype.call = function (observer, source) {
-	        return source._subscribe(new LastSubscriber(observer, this.predicate, this.resultSelector, this.defaultValue, this.source));
+	        return source.subscribe(new LastSubscriber(observer, this.predicate, this.resultSelector, this.defaultValue, this.source));
 	    };
 	    return LastOperator;
 	}();
@@ -22122,7 +22259,7 @@
 	        this.source = source;
 	    }
 	    EveryOperator.prototype.call = function (observer, source) {
-	        return source._subscribe(new EverySubscriber(observer, this.predicate, this.thisArg, this.source));
+	        return source.subscribe(new EverySubscriber(observer, this.predicate, this.thisArg, this.source));
 	    };
 	    return EveryOperator;
 	}();
@@ -22236,7 +22373,7 @@
 	        this.value = value;
 	    }
 	    MapToOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new MapToSubscriber(subscriber, this.value));
+	        return source.subscribe(new MapToSubscriber(subscriber, this.value));
 	    };
 	    return MapToOperator;
 	}();
@@ -22313,6 +22450,13 @@
 	 * var materialized = upperCase.materialize();
 	 * materialized.subscribe(x => console.log(x));
 	 *
+	 * // Results in the following:
+	 * // - Notification {kind: "N", value: "A", error: undefined, hasValue: true}
+	 * // - Notification {kind: "N", value: "B", error: undefined, hasValue: true}
+	 * // - Notification {kind: "E", value: undefined, error: TypeError:
+	 * //   x.toUpperCase is not a function at MapSubscriber.letters.map.x
+	 * //   [as project] (http://1…, hasValue: false}
+	 *
 	 * @see {@link Notification}
 	 * @see {@link dematerialize}
 	 *
@@ -22329,7 +22473,7 @@
 	var MaterializeOperator = function () {
 	    function MaterializeOperator() {}
 	    MaterializeOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new MaterializeSubscriber(subscriber));
+	        return source.subscribe(new MaterializeSubscriber(subscriber));
 	    };
 	    return MaterializeOperator;
 	}();
@@ -22485,7 +22629,7 @@
 	        this.hasSeed = hasSeed;
 	    }
 	    ReduceOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new ReduceSubscriber(subscriber, this.accumulator, this.seed, this.hasSeed));
+	        return source.subscribe(new ReduceSubscriber(subscriber, this.accumulator, this.seed, this.hasSeed));
 	    };
 	    return ReduceOperator;
 	}();
@@ -22630,7 +22774,7 @@
 	        this.concurrent = concurrent;
 	    }
 	    MergeScanOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new MergeScanSubscriber(subscriber, this.project, this.seed, this.concurrent));
+	        return source.subscribe(new MergeScanSubscriber(subscriber, this.project, this.seed, this.concurrent));
 	    };
 	    return MergeScanOperator;
 	}();
@@ -22809,7 +22953,7 @@
 	        var selector = this.selector;
 	        var subject = this.subjectFactory();
 	        var subscription = selector(subject).subscribe(subscriber);
-	        subscription.add(source._subscribe(subject));
+	        subscription.add(source.subscribe(subject));
 	        return subscription;
 	    };
 	    return MulticastOperator;
@@ -22921,7 +23065,7 @@
 	        var connectable = this.connectable;
 	        connectable._refCount++;
 	        var refCounter = new RefCountSubscriber(subscriber, connectable);
-	        var subscription = source._subscribe(refCounter);
+	        var subscription = source.subscribe(refCounter);
 	        if (!refCounter.closed) {
 	            refCounter.connection = connectable.connect();
 	        }
@@ -23076,7 +23220,7 @@
 	var PairwiseOperator = function () {
 	    function PairwiseOperator() {}
 	    PairwiseOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new PairwiseSubscriber(subscriber));
+	        return source.subscribe(new PairwiseSubscriber(subscriber));
 	    };
 	    return PairwiseOperator;
 	}();
@@ -23539,7 +23683,7 @@
 	        this.source = source;
 	    }
 	    RepeatOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new RepeatSubscriber(subscriber, this.count, this.source));
+	        return source.subscribe(new RepeatSubscriber(subscriber, this.count, this.source));
 	    };
 	    return RepeatOperator;
 	}();
@@ -23631,7 +23775,7 @@
 	        this.source = source;
 	    }
 	    RepeatWhenOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new RepeatWhenSubscriber(subscriber, this.notifier, this.source));
+	        return source.subscribe(new RepeatWhenSubscriber(subscriber, this.notifier, this.source));
 	    };
 	    return RepeatWhenOperator;
 	}();
@@ -23761,7 +23905,7 @@
 	        this.source = source;
 	    }
 	    RetryOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new RetrySubscriber(subscriber, this.count, this.source));
+	        return source.subscribe(new RetrySubscriber(subscriber, this.count, this.source));
 	    };
 	    return RetryOperator;
 	}();
@@ -23853,7 +23997,7 @@
 	        this.source = source;
 	    }
 	    RetryWhenOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new RetryWhenSubscriber(subscriber, this.notifier, this.source));
+	        return source.subscribe(new RetryWhenSubscriber(subscriber, this.notifier, this.source));
 	    };
 	    return RetryWhenOperator;
 	}();
@@ -23998,7 +24142,7 @@
 	    }
 	    SampleOperator.prototype.call = function (subscriber, source) {
 	        var sampleSubscriber = new SampleSubscriber(subscriber);
-	        var subscription = source._subscribe(sampleSubscriber);
+	        var subscription = source.subscribe(sampleSubscriber);
 	        subscription.add(subscribeToResult_1.subscribeToResult(sampleSubscriber, this.notifier));
 	        return subscription;
 	    };
@@ -24111,7 +24255,7 @@
 	        this.scheduler = scheduler;
 	    }
 	    SampleTimeOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new SampleTimeSubscriber(subscriber, this.period, this.scheduler));
+	        return source.subscribe(new SampleTimeSubscriber(subscriber, this.period, this.scheduler));
 	    };
 	    return SampleTimeOperator;
 	}();
@@ -24236,7 +24380,7 @@
 	        this.hasSeed = hasSeed;
 	    }
 	    ScanOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new ScanSubscriber(subscriber, this.accumulator, this.seed, this.hasSeed));
+	        return source.subscribe(new ScanSubscriber(subscriber, this.accumulator, this.seed, this.hasSeed));
 	    };
 	    return ScanOperator;
 	}();
@@ -24333,7 +24477,7 @@
 	 * completes or emits after the other complets, the returned observable will never complete.
 	 *
 	 * @example <caption>figure out if the Konami code matches</caption>
-	 * var code = Observable.from([
+	 * var code = Rx.Observable.from([
 	 *  "ArrowUp",
 	 *  "ArrowUp",
 	 *  "ArrowDown",
@@ -24378,7 +24522,7 @@
 	        this.comparor = comparor;
 	    }
 	    SequenceEqualOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new SequenceEqualSubscriber(subscriber, this.compareTo, this.comparor));
+	        return source.subscribe(new SequenceEqualSubscriber(subscriber, this.compareTo, this.comparor));
 	    };
 	    return SequenceEqualOperator;
 	}();
@@ -24565,7 +24709,7 @@
 	        this.source = source;
 	    }
 	    SingleOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new SingleSubscriber(subscriber, this.predicate, this.source));
+	        return source.subscribe(new SingleSubscriber(subscriber, this.predicate, this.source));
 	    };
 	    return SingleOperator;
 	}();
@@ -24669,7 +24813,7 @@
 	        this.total = total;
 	    }
 	    SkipOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new SkipSubscriber(subscriber, this.total));
+	        return source.subscribe(new SkipSubscriber(subscriber, this.total));
 	    };
 	    return SkipOperator;
 	}();
@@ -24742,7 +24886,7 @@
 	        this.notifier = notifier;
 	    }
 	    SkipUntilOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new SkipUntilSubscriber(subscriber, this.notifier));
+	        return source.subscribe(new SkipUntilSubscriber(subscriber, this.notifier));
 	    };
 	    return SkipUntilOperator;
 	}();
@@ -24831,7 +24975,7 @@
 	        this.predicate = predicate;
 	    }
 	    SkipWhileOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new SkipWhileSubscriber(subscriber, this.predicate));
+	        return source.subscribe(new SkipWhileSubscriber(subscriber, this.predicate));
 	    };
 	    return SkipWhileOperator;
 	}();
@@ -24957,12 +25101,22 @@
 	 * @owner Observable
 	 */
 	function subscribeOn(scheduler, delay) {
-	  if (delay === void 0) {
-	    delay = 0;
-	  }
-	  return new SubscribeOnObservable_1.SubscribeOnObservable(this, delay, scheduler);
+	    if (delay === void 0) {
+	        delay = 0;
+	    }
+	    return this.lift(new SubscribeOnOperator(scheduler, delay));
 	}
 	exports.subscribeOn = subscribeOn;
+	var SubscribeOnOperator = function () {
+	    function SubscribeOnOperator(scheduler, delay) {
+	        this.scheduler = scheduler;
+	        this.delay = delay;
+	    }
+	    SubscribeOnOperator.prototype.call = function (subscriber, source) {
+	        return new SubscribeOnObservable_1.SubscribeOnObservable(source, this.delay, this.scheduler).subscribe(subscriber);
+	    };
+	    return SubscribeOnOperator;
+	}();
 	//# sourceMappingURL=subscribeOn.js.map
 
 /***/ },
@@ -25019,7 +25173,7 @@
 	    SubscribeOnObservable.dispatch = function (arg) {
 	        var source = arg.source,
 	            subscriber = arg.subscriber;
-	        return source.subscribe(subscriber);
+	        return this.add(source.subscribe(subscriber));
 	    };
 	    SubscribeOnObservable.prototype._subscribe = function (subscriber) {
 	        var delay = this.delayTime;
@@ -25882,7 +26036,7 @@
 	var SwitchOperator = function () {
 	    function SwitchOperator() {}
 	    SwitchOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new SwitchSubscriber(subscriber));
+	        return source.subscribe(new SwitchSubscriber(subscriber));
 	    };
 	    return SwitchOperator;
 	}();
@@ -26018,7 +26172,7 @@
 	        this.resultSelector = resultSelector;
 	    }
 	    SwitchMapOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new SwitchMapSubscriber(subscriber, this.project, this.resultSelector));
+	        return source.subscribe(new SwitchMapSubscriber(subscriber, this.project, this.resultSelector));
 	    };
 	    return SwitchMapOperator;
 	}();
@@ -26172,7 +26326,7 @@
 	        this.resultSelector = resultSelector;
 	    }
 	    SwitchMapToOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new SwitchMapToSubscriber(subscriber, this.observable, this.resultSelector));
+	        return source.subscribe(new SwitchMapToSubscriber(subscriber, this.observable, this.resultSelector));
 	    };
 	    return SwitchMapToOperator;
 	}();
@@ -26316,7 +26470,7 @@
 	        }
 	    }
 	    TakeOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new TakeSubscriber(subscriber, this.total));
+	        return source.subscribe(new TakeSubscriber(subscriber, this.total));
 	    };
 	    return TakeOperator;
 	}();
@@ -26427,7 +26581,7 @@
 	        }
 	    }
 	    TakeLastOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new TakeLastSubscriber(subscriber, this.total));
+	        return source.subscribe(new TakeLastSubscriber(subscriber, this.total));
 	    };
 	    return TakeLastOperator;
 	}();
@@ -26541,7 +26695,7 @@
 	        this.notifier = notifier;
 	    }
 	    TakeUntilOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new TakeUntilSubscriber(subscriber, this.notifier));
+	        return source.subscribe(new TakeUntilSubscriber(subscriber, this.notifier));
 	    };
 	    return TakeUntilOperator;
 	}();
@@ -26638,7 +26792,7 @@
 	        this.predicate = predicate;
 	    }
 	    TakeWhileOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new TakeWhileSubscriber(subscriber, this.predicate));
+	        return source.subscribe(new TakeWhileSubscriber(subscriber, this.predicate));
 	    };
 	    return TakeWhileOperator;
 	}();
@@ -26751,7 +26905,7 @@
 	        this.durationSelector = durationSelector;
 	    }
 	    ThrottleOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new ThrottleSubscriber(subscriber, this.durationSelector));
+	        return source.subscribe(new ThrottleSubscriber(subscriber, this.durationSelector));
 	    };
 	    return ThrottleOperator;
 	}();
@@ -26883,7 +27037,7 @@
 	        this.scheduler = scheduler;
 	    }
 	    ThrottleTimeOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new ThrottleTimeSubscriber(subscriber, this.duration, this.scheduler));
+	        return source.subscribe(new ThrottleTimeSubscriber(subscriber, this.duration, this.scheduler));
 	    };
 	    return ThrottleTimeOperator;
 	}();
@@ -26975,7 +27129,7 @@
 	        this.scheduler = scheduler;
 	    }
 	    TimeIntervalOperator.prototype.call = function (observer, source) {
-	        return source._subscribe(new TimeIntervalSubscriber(observer, this.scheduler));
+	        return source.subscribe(new TimeIntervalSubscriber(observer, this.scheduler));
 	    };
 	    return TimeIntervalOperator;
 	}();
@@ -27055,7 +27209,7 @@
 	        this.errorInstance = errorInstance;
 	    }
 	    TimeoutOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new TimeoutSubscriber(subscriber, this.absoluteTimeout, this.waitFor, this.scheduler, this.errorInstance));
+	        return source.subscribe(new TimeoutSubscriber(subscriber, this.absoluteTimeout, this.waitFor, this.scheduler, this.errorInstance));
 	    };
 	    return TimeoutOperator;
 	}();
@@ -27214,7 +27368,7 @@
 	        this.scheduler = scheduler;
 	    }
 	    TimeoutWithOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new TimeoutWithSubscriber(subscriber, this.absoluteTimeout, this.waitFor, this.withObservable, this.scheduler));
+	        return source.subscribe(new TimeoutWithSubscriber(subscriber, this.absoluteTimeout, this.waitFor, this.withObservable, this.scheduler));
 	    };
 	    return TimeoutWithOperator;
 	}();
@@ -27346,7 +27500,7 @@
 	        this.scheduler = scheduler;
 	    }
 	    TimestampOperator.prototype.call = function (observer, source) {
-	        return source._subscribe(new TimestampSubscriber(observer, this.scheduler));
+	        return source.subscribe(new TimestampSubscriber(observer, this.scheduler));
 	    };
 	    return TimestampOperator;
 	}();
@@ -27402,7 +27556,7 @@
 	var ToArrayOperator = function () {
 	    function ToArrayOperator() {}
 	    ToArrayOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new ToArraySubscriber(subscriber));
+	        return source.subscribe(new ToArraySubscriber(subscriber));
 	    };
 	    return ToArrayOperator;
 	}();
@@ -27553,7 +27707,7 @@
 	    }
 	    WindowOperator.prototype.call = function (subscriber, source) {
 	        var windowSubscriber = new WindowSubscriber(subscriber);
-	        var sourceSubscription = source._subscribe(windowSubscriber);
+	        var sourceSubscription = source.subscribe(windowSubscriber);
 	        if (!sourceSubscription.closed) {
 	            windowSubscriber.add(subscribeToResult_1.subscribeToResult(windowSubscriber, this.windowBoundaries));
 	        }
@@ -27697,7 +27851,7 @@
 	        this.startWindowEvery = startWindowEvery;
 	    }
 	    WindowCountOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new WindowCountSubscriber(subscriber, this.windowSize, this.startWindowEvery));
+	        return source.subscribe(new WindowCountSubscriber(subscriber, this.windowSize, this.startWindowEvery));
 	    };
 	    return WindowCountOperator;
 	}();
@@ -27856,7 +28010,7 @@
 	        this.scheduler = scheduler;
 	    }
 	    WindowTimeOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new WindowTimeSubscriber(subscriber, this.windowTimeSpan, this.windowCreationInterval, this.scheduler));
+	        return source.subscribe(new WindowTimeSubscriber(subscriber, this.windowTimeSpan, this.windowCreationInterval, this.scheduler));
 	    };
 	    return WindowTimeOperator;
 	}();
@@ -28043,7 +28197,7 @@
 	        this.closingSelector = closingSelector;
 	    }
 	    WindowToggleOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new WindowToggleSubscriber(subscriber, this.openings, this.closingSelector));
+	        return source.subscribe(new WindowToggleSubscriber(subscriber, this.openings, this.closingSelector));
 	    };
 	    return WindowToggleOperator;
 	}();
@@ -28236,7 +28390,7 @@
 	        this.closingSelector = closingSelector;
 	    }
 	    WindowOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new WindowSubscriber(subscriber, this.closingSelector));
+	        return source.subscribe(new WindowSubscriber(subscriber, this.closingSelector));
 	    };
 	    return WindowOperator;
 	}();
@@ -28392,7 +28546,7 @@
 	        this.project = project;
 	    }
 	    WithLatestFromOperator.prototype.call = function (subscriber, source) {
-	        return source._subscribe(new WithLatestFromSubscriber(subscriber, this.observables, this.project));
+	        return source.subscribe(new WithLatestFromSubscriber(subscriber, this.observables, this.project));
 	    };
 	    return WithLatestFromOperator;
 	}();
@@ -29314,8 +29468,12 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 	function staticArr() {
-	    var arr = [1, 2, 3, 4];
+	    var _arr;
+
+	    var arr = (_arr = { id: 1 }, _defineProperty(_arr, 'id', 2), _defineProperty(_arr, 'id', 3), _defineProperty(_arr, 'id', 4), _arr);
 	    var output = (0, _jquery2.default)('#arrOutput');
 	    var arr$ = _Rx2.default.Observable.from(arr);
 
@@ -29377,6 +29535,222 @@
 	        return console.log('err: ', err);
 	    }, function (complete) {
 	        return console.log('custom complete');
+	    });
+	}
+
+/***/ },
+/* 351 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.default = interval;
+
+	var _Rx = __webpack_require__(3);
+
+	var _Rx2 = _interopRequireDefault(_Rx);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function interval() {
+	    var interval$ = _Rx2.default.Observable.interval(1000);
+	    interval$.subscribe(function (x) {
+	        console.log(x);
+	    });
+
+	    // or if we need to limit the number of intervals use take operator
+	    // and now it will fire complete event too.
+	    var take$ = _Rx2.default.Observable.interval(1000).take(5);
+	    take$.subscribe(function (x) {
+	        console.log(x);
+	    }, function (err) {
+	        console.log(err);
+	    }, function (complete) {
+	        console.log("complete");
+	    });
+
+	    // use timer if we need to specify diiferent time elapsed from start and in between
+	    var timer$ = _Rx2.default.Observable.timer(3000, 1000).take(5);
+	    timer$.subscribe(function (x) {
+	        console.log(x);
+	    }, function (err) {
+	        console.log(err);
+	    }, function (complete) {
+	        console.log("complete");
+	    });
+	}
+
+/***/ },
+/* 352 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.default = mapNpluck;
+
+	var _Rx = __webpack_require__(3);
+
+	var _Rx2 = _interopRequireDefault(_Rx);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function mapNpluck() {
+
+	    var users = [{ name: 'hammad', age: 23 }, { name: 'ali', age: 21 }, { name: 'bilal', age: 27 }, { name: 'maria', age: 29 }, { name: 'asad', age: 14 }];
+
+	    var users$ = _Rx2.default.Observable.from(users);
+
+	    // single map operator
+	    users$.map(function (v) {
+	        return v.name;
+	    }).subscribe(function (v) {
+	        return console.log(v);
+	    });
+
+	    // multiple map operators
+	    users$.map(function (v) {
+	        return v.name;
+	    }).map(function (v) {
+	        return v.toUpperCase();
+	    }).subscribe(function (v) {
+	        return console.log(v);
+	    });
+
+	    // pluck operator
+	    users$.pluck("age").subscribe(function (v) {
+	        return console.log(v);
+	    });
+	}
+
+/***/ },
+/* 353 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.default = mergeNconcat;
+
+	var _Rx = __webpack_require__(3);
+
+	var _Rx2 = _interopRequireDefault(_Rx);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function mergeNconcat() {
+
+	    var source1$ = _Rx2.default.Observable.interval(200).take(10);
+	    var source2$ = _Rx2.default.Observable.interval(1000).take(10);
+
+	    // merge operator to emit value of two obsevables parallel
+	    console.log('merge demo');
+	    _Rx2.default.Observable.merge(source1$, source2$).subscribe(function (x) {
+	        return console.log(x);
+	    });
+
+	    // concat operator to emit value sequentially depends on order of observables
+	    // console.log('concat demo');
+	    // Rx.Observable
+	    // .concat(source1$,source2$)
+	    // .subscribe(x => console.log(x));
+	}
+
+/***/ },
+/* 354 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.default = mergeMap;
+
+	var _Rx = __webpack_require__(3);
+
+	var _Rx2 = _interopRequireDefault(_Rx);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function mergeMap() {
+
+	    //Nested subscribes
+	    // Rx.Observable.of('Hello')
+	    // .subscribe(v=>{
+	    //     Rx.Observable.of(v+' Everyone')
+	    //     .subscribe(x=>console.log(x));
+	    // });
+
+	    // mergeMap is correct way to handle nested subscribes
+	    _Rx2.default.Observable.of('Hello').mergeMap(function (v) {
+	        return _Rx2.default.Observable.of(v + ' Everyone');
+	    }).subscribe(function (x) {
+	        console.log(x);
+	    });
+	}
+
+/***/ },
+/* 355 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.default = switchMap;
+
+	var _Rx = __webpack_require__(3);
+
+	var _Rx2 = _interopRequireDefault(_Rx);
+
+	var _jquery = __webpack_require__(1);
+
+	var _jquery2 = _interopRequireDefault(_jquery);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function switchMap() {
+	    var _this = this;
+
+	    // const source = Rx.Observable.fromEvent($('#btn'), 'click');
+	    // //if another click comes within 3s, message will not be emitted
+	    // const example = source.switchMap(val => Rx.Observable.interval(3000).mapTo('Hello, I made it!'));
+	    // //(click)...3s...'Hello I made it!'...(click)...2s(click)...
+	    // const subscribe = example.subscribe(val => console.log(val));
+
+
+	    // const interval$ = Rx.Observable.interval(1000)
+	    // .switchMap( () => {
+	    //     const req =  $.ajax({
+	    //         url: 'https://api.github.com/users',
+	    //         dataType: 'json'
+	    //     }).promise()
+	    //     Rx.Observable.fromPromise(req)
+	    //         .catch(err => Rx.Observable.of(1))
+	    //         .subscribe(x=>console.log("b",x))
+	    // })
+	    // interval$
+	    // .catch(err => Rx.Observable.of(1))
+	    // .subscribe(x=>console.log("a",x))
+
+
+	    // this way observable will never die bcoz if any req fails, it will be catched and log the message,
+	    // while donot effect other req process 
+	    _Rx2.default.Observable.interval(1000).switchMap(function () {
+	        _this.http.get("https://api.github.com/users").catch(function (err) {
+	            return _Rx2.default.Observable.of(err);
+	        });
+	    }).subscribe(function (x) {
+	        return console.log(x);
 	    });
 	}
 
