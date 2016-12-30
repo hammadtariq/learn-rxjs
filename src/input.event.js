@@ -7,7 +7,7 @@ export default function inputEvent() {
     const input$ = Rx.Observable.fromEvent(input,'keyup');
 
     input$.subscribe(
-        e => {output.append(e.target.value)},
+        e => {output.text(e.target.value)},
         err => console.log(err),
         complete => console.log('input complete')
     );

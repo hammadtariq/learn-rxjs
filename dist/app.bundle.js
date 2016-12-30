@@ -96,15 +96,15 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	// btnEvent();
-	// mouseEvent();
-	// inputEvent();
-	// staticArr(); 
-	// customObservable();
-	// interval();
-	// mapNpluck();
-	// mergeNconcat();
-	// mergeMap();
+	(0, _btn2.default)();
+	(0, _mouse2.default)();
+	(0, _input2.default)();
+	(0, _static2.default)();
+	(0, _custom2.default)();
+	(0, _interval2.default)();
+	(0, _mapNpluck2.default)();
+	(0, _mergeNconcat2.default)();
+	(0, _mergeMap2.default)();
 	(0, _switchMap2.default)();
 
 /***/ },
@@ -29366,11 +29366,13 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function btnEvent() {
+	    var count = 0;
 	    var btn = (0, _jquery2.default)('#btn');
 	    var click$ = _Rx2.default.Observable.fromEvent(btn, 'click');
 
 	    click$.subscribe(function (e) {
-	        return console.log("Clicked");
+	        count++;
+	        (0, _jquery2.default)('#btnClick').text('Clicked' + count);
 	    }, function (err) {
 	        return console.log(err);
 	    }, function (complete) {
@@ -29439,7 +29441,7 @@
 	    var input$ = _Rx2.default.Observable.fromEvent(input, 'keyup');
 
 	    input$.subscribe(function (e) {
-	        output.append(e.target.value);
+	        output.text(e.target.value);
 	    }, function (err) {
 	        return console.log(err);
 	    }, function (complete) {
@@ -29468,12 +29470,8 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 	function staticArr() {
-	    var _arr;
-
-	    var arr = (_arr = { id: 1 }, _defineProperty(_arr, 'id', 2), _defineProperty(_arr, 'id', 3), _defineProperty(_arr, 'id', 4), _arr);
+	    var arr = [1, 2, 3, 4];
 	    var output = (0, _jquery2.default)('#arrOutput');
 	    var arr$ = _Rx2.default.Observable.from(arr);
 
@@ -29719,7 +29717,6 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function switchMap() {
-	    var _this = this;
 
 	    // const source = Rx.Observable.fromEvent($('#btn'), 'click');
 	    // //if another click comes within 3s, message will not be emitted
@@ -29728,30 +29725,32 @@
 	    // const subscribe = example.subscribe(val => console.log(val));
 
 
-	    // const interval$ = Rx.Observable.interval(1000)
-	    // .switchMap( () => {
-	    //     const req =  $.ajax({
-	    //         url: 'https://api.github.com/users',
-	    //         dataType: 'json'
-	    //     }).promise()
-	    //     Rx.Observable.fromPromise(req)
-	    //         .catch(err => Rx.Observable.of(1))
-	    //         .subscribe(x=>console.log("b",x))
-	    // })
-	    // interval$
-	    // .catch(err => Rx.Observable.of(1))
-	    // .subscribe(x=>console.log("a",x))
-
+	    var interval$ = _Rx2.default.Observable.interval(1000).switchMap(function () {
+	        var req = _jquery2.default.ajax({
+	            url: 'https://api.github.com/users',
+	            dataType: 'json'
+	        }).promise();
+	        _Rx2.default.Observable.fromPromise(req).catch(function (err) {
+	            return _Rx2.default.Observable.of(1);
+	        }).subscribe(function (x) {
+	            return console.log("b", x);
+	        });
+	    });
+	    interval$.catch(function (err) {
+	        return _Rx2.default.Observable.of(1);
+	    }).subscribe(function (x) {
+	        return console.log("a", x);
+	    });
 
 	    // this way observable will never die bcoz if any req fails, it will be catched and log the message,
 	    // while donot effect other req process 
-	    _Rx2.default.Observable.interval(1000).switchMap(function () {
-	        _this.http.get("https://api.github.com/users").catch(function (err) {
-	            return _Rx2.default.Observable.of(err);
-	        });
-	    }).subscribe(function (x) {
-	        return console.log(x);
-	    });
+	    // Rx.Observable.interval(1000)
+	    // .switchMap(() => {
+	    //     this.http.get("https://api.github.com/users")
+	    //         .catch(err => Rx.Observable.of(err))
+	    // })
+	    // .subscribe(x=>console.log(x));
+
 	}
 
 /***/ }
